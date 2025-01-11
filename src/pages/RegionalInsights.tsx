@@ -9,34 +9,6 @@ import { ArrowLeft } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import Chat from "@/components/Chat";
 
-const apiKey = 'AIzaSyAh2qi-zgjWVVNgYL8h6sJzaA6xX2Vlb8A';
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-const requestData = {
-  contents: [
-    {
-      parts: [
-        { text: "Where is this location on the earth? 45.513506, -73.652042" }
-      ]
-    }
-  ]
-};
-
-fetch(url, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(requestData),
-})
-  .then(response => response.json())
-  .then(data => {
-    console.log(data.candidates[0].content.parts[0].text);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
 type Location = {
   lat: number;
   lng: number;
@@ -95,31 +67,7 @@ const RegionalInsights = () => {
             </CardContent>
           </Card>
         </div>
-
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Recent Incidents</h2>
-          {incidents?.map((incident) => (
-            <Card key={incident.id}>
-              <CardHeader>
-                <CardTitle>{incident.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{incident.description}</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Type: {incident.type} | Reported:{" "}
-                  {new Date(incident.timestamp || "").toLocaleDateString()}
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Location: Lat {incident.location.lat}, Lng {incident.location.lng}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Add the Chat component here */}
         <Chat incidents={incidents || []} />
-
       </div>
     </div>
   );
