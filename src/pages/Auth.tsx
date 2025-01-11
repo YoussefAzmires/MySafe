@@ -33,7 +33,7 @@ const AuthPage = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold">Welcome to MeSafe</h1>
+          <h1 className="text-2xl font-bold">Welcome to MySafe</h1>
           <p className="text-muted-foreground">Sign in to report and track incidents in your community</p>
         </div>
         <div className="bg-card p-6 rounded-lg shadow-lg">

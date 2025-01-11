@@ -45,7 +45,7 @@ const Navbar = () => {
         <Link to="/regional-insights">
           <Button variant="ghost" className="gap-2">
             <BarChart2 className="h-4 w-4" />
-            Regional Insights
+            Insights
           </Button>
         </Link>
         <Button 

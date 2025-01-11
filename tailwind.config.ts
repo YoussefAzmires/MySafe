@@ -33,14 +33,14 @@ export default {
           foreground: "#ffffff",
         },
         destructive: {
-          DEFAULT: "#e53e3e", // Red for safety concerns
+          DEFAULT: "#910000", // Red for high danger
           foreground: "#ffffff",
         },
         incident: {
-          accident: "#f59e0b", // Amber for accidents
-          infrastructure: "#10b981", // Emerald for infrastructure
-          noise: "#8b5cf6", // Purple for noise
-          other: "#6b7280", // Gray for other
+          accident: "#e53e3e", // Yellow for low danger (accidents)
+          infrastructure: "#f97316", // Orange for moderate danger (infrastructure)
+          noise: "#fcd34d", // Strong pinkish-red for more danger (noise)
+          other: "#9ca3af", // Gray for least dangerous (other)
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
