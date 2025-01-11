@@ -57,14 +57,6 @@ const SafetyMap = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<{
-    name: string;
-    bounds: {
-      _sw: { lat: number; lng: number };
-      _ne: { lat: number; lng: number };
-    };
-    mapImage: string;
-  } | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -306,22 +298,9 @@ const SafetyMap = () => {
 
       newMap.on("click", handleMapClick);
 
-      // Update region and store data when map moves
+      // Update incidents when map moves
       newMap.on("moveend", async () => {
         const bounds = newMap.getBounds();
-
-        const regionDetails = {
-          name: "Current View",
-          bounds: {
-            _sw: { lat: bounds.getSouth(), lng: bounds.getWest() },
-            _ne: { lat: bounds.getNorth(), lng: bounds.getEast() },
-          },
-          mapImage: `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}/500x500?access_token=YOUR_MAPBOX_ACCESS_TOKEN`,
-        };
-
-        console.log("Updating Selected Region:", regionDetails);
-
-        setSelectedRegion(regionDetails);
 
         try {
           // Fetch incidents within viewport
@@ -352,19 +331,6 @@ const SafetyMap = () => {
             })) as Incident[];
 
             setFilteredIncidents(transformedData);
-
-            // Store the current incidents in Supabase for Regional Insights
-            const { error: storeError } = await supabase
-              .from("current_region")
-              .upsert({
-                id: 1, // Single row
-                name: "Current View",
-                incident_ids: transformedData.map((incident) => incident.id),
-              });
-
-            if (storeError) {
-              console.error("Error storing current incidents:", storeError);
-            }
           }
         } catch (error) {
           console.error("Error updating incidents:", error);
@@ -540,25 +506,45 @@ const SafetyMap = () => {
     };
   }, [incidents]);
 
+  useEffect(() => {
+    const channel = supabase
+      .channel('messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          console.log('New message received:', payload);
+          const newMessage = payload.new as Message;
+          
+          if (selectedIncident && newMessage.incident_id === selectedIncident.id) {
+            setSelectedIncident(prev => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                messages: [...(prev.messages || []), newMessage],
+              };
+            });
+          }
+          
+          queryClient.invalidateQueries({ queryKey: ['incidents'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedIncident?.id, queryClient]);
+
   return (
     <div className="h-screen w-screen relative pt-14">
-      {selectedRegion && (
-        <div className="absolute top-20 left-4 z-10 bg-background/80 backdrop-blur-sm p-4 rounded-lg shadow-lg border">
-          <h2 className="text-lg font-semibold text-primary">Current Region</h2>
-          <p className="text-muted-foreground">{selectedRegion.name}</p>
-        </div>
-      )}
       <div ref={mapContainer} className="absolute inset-0 mt-14" />
 
       <div className="absolute top-20 right-4 z-10 space-x-2 flex">
-        <Button
-          onClick={() =>
-            window.dispatchEvent(new CustomEvent("filter-incidents"))
-          }
-          variant="secondary"
-        >
-          Filter Incidents
-        </Button>
         <Button onClick={handleAddIncident} variant="default">
           + Report Incident
         </Button>
