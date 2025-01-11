@@ -44,7 +44,6 @@ const RegionalInsights = () => {
         console.error("Error fetching incidents:", error);
         throw error;
       }
-
       return (data as any[]).map((incident) => ({
         ...incident,
         location: incident.location as Location,
@@ -56,16 +55,8 @@ const RegionalInsights = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto pt-20 px-4">
-        <Button
-          onClick={() => navigate("/safety-hub")}
-          variant="ghost"
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Safety Hub
-        </Button>
 
-        <h1 className="text-3xl font-bold mb-6">Regional Insights</h1>
+        <h1 className="text-3xl font-bold mb-6">Insights</h1>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
@@ -79,22 +70,25 @@ const RegionalInsights = () => {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Recent Incidents</h2>
-          {incidents?.map((incident) => (
-            <Card key={incident.id}>
-              <CardHeader>
-                <CardTitle>{incident.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{incident.description}</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Type: {incident.type} | Reported:{" "}
-                  {new Date(incident.timestamp || "").toLocaleDateString()}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+  <h2 className="text-2xl font-semibold">Recent Incidents</h2>
+  {incidents?.map((incident) => (
+    <Card key={incident.id}>
+      <CardHeader>
+        <CardTitle>{incident.title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>{incident.description}</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Type: {incident.type} | Reported:{" "}
+          {new Date(incident.timestamp || "").toLocaleDateString()}
+        </p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Location: Lat {incident.location.lat}, Lng {incident.location.lng}
+        </p>
+      </CardContent>
+    </Card>
+  ))}
+</div>
       </div>
     </div>
   );
