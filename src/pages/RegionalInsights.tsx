@@ -27,32 +27,9 @@ type Incident = {
 const RegionalInsights = () => {
   const navigate = useNavigate();
 
-  const { data: currentRegion } = useQuery({
-    queryKey: ["currentRegion"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("current_region")
-        .select("*")
-        .single();
-
-      if (error) {
-        console.error("Error fetching current region:", error);
-        throw error;
-      }
-
-      console.log("Fetched currentRegion:", data);
-      return data;
-    },
-  });
-
   const { data: incidents } = useQuery<Incident[]>({
-    queryKey: ["regionalIncidents", currentRegion?.incident_ids],
+    queryKey: ["incidents"],
     queryFn: async () => {
-      if (!currentRegion?.incident_ids?.length) {
-        console.warn("No incident IDs found for current region.");
-        return [];
-      }
-
       const { data, error } = await supabase
         .from("incidents")
         .select(
@@ -61,24 +38,19 @@ const RegionalInsights = () => {
           messages(*)
         `
         )
-        .in("id", currentRegion.incident_ids);
+        .order("timestamp", { ascending: false });
 
       if (error) {
         console.error("Error fetching incidents:", error);
         throw error;
       }
 
-      console.log("Fetched incidents:", data);
       return (data as any[]).map((incident) => ({
         ...incident,
         location: incident.location as Location,
       })) as Incident[];
     },
-    enabled: !!currentRegion?.incident_ids?.length,
   });
-
-  console.log("Current region:", currentRegion);
-  console.log("Incidents:", incidents);
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,7 +70,7 @@ const RegionalInsights = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Visible Incidents</CardTitle>
+              <CardTitle>Total Incidents</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-4xl font-bold">{incidents?.length || 0}</p>
