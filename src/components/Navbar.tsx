@@ -1,13 +1,15 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from './ui/button';
+import { LogOut, Map, Home, BarChart2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -18,32 +20,42 @@ const Navbar = () => {
         variant: "destructive",
       });
     } else {
-      navigate("/auth");
+      navigate('/auth');
     }
   };
 
+  if (location.pathname === '/auth') return null;
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
-      <div className="container mx-auto px-4">
-        <div className="flex h-14 items-center justify-between">
-          <div className="flex space-x-4">
-            <Link
-              to="/safety-hub"
-              className="text-foreground hover:text-foreground/80 transition-colors"
-            >
-              Safety Hub
-            </Link>
-            <Link
-              to="/worldwide-insights"
-              className="text-foreground hover:text-foreground/80 transition-colors"
-            >
-              Worldwide Insights
-            </Link>
-          </div>
-          <Button onClick={handleSignOut} variant="ghost">
-            Sign Out
+    <nav className="bg-primary text-primary-foreground px-4 py-3 flex justify-between items-center fixed top-0 left-0 right-0 z-50">
+      <Link to="/" className="text-xl font-bold">Community Safety Watch</Link>
+      <div className="flex items-center gap-4">
+        <Link to="/">
+          <Button variant="ghost" className="gap-2">
+            <Home className="h-4 w-4" />
+            Home
           </Button>
-        </div>
+        </Link>
+        <Link to="/safety-hub">
+          <Button variant="ghost" className="gap-2">
+            <Map className="h-4 w-4" />
+            Safety Hub
+          </Button>
+        </Link>
+        <Link to="/regional-insights">
+          <Button variant="ghost" className="gap-2">
+            <BarChart2 className="h-4 w-4" />
+            Regional Insights
+          </Button>
+        </Link>
+        <Button 
+          onClick={handleSignOut} 
+          variant="secondary" 
+          className="gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          Sign Out
+        </Button>
       </div>
     </nav>
   );
