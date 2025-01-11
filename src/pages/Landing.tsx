@@ -11,7 +11,7 @@ const Landing = () => {
         {/* Hero Section */}
         <div className="text-center mb-16 animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-bold text-primary mb-6 animate-scale-in">
-            Community Safety Watch
+            MySafe
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in opacity-0" style={{ animationDelay: '300ms' }}>
             Join your neighbors in making our community safer. Report and track incidents, stay informed, and help create a safer environment for everyone.
