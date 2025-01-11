@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SafetyMap from '@/components/SafetyMap';
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ShieldAlert, Ambulance } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
