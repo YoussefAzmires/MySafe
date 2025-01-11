@@ -4,7 +4,6 @@ import Landing from './pages/Landing';
 import SafetyHub from './pages/SafetyHub';
 import AuthPage from './pages/Auth';
 import RegionalInsights from './pages/RegionalInsights';
-import Index from './pages/Index';
 import { Toaster } from "@/components/ui/toaster";
 
 // Create a client
@@ -22,8 +21,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/landing" element={<Landing />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/safety-hub" element={<SafetyHub />} />
           <Route path="/regional-insights" element={<RegionalInsights />} />
           <Route path="/auth" element={<AuthPage />} />
