@@ -10,7 +10,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
+import { Send, Filter } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import IncidentForm from "./IncidentForm";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,6 +63,7 @@ const SafetyMap = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -90,7 +97,6 @@ const SafetyMap = () => {
         throw error;
       }
 
-      // Transform the data to match our Incident type
       return (data as any[]).map((incident) => ({
         ...incident,
         location: incident.location as Location,
@@ -101,8 +107,12 @@ const SafetyMap = () => {
   const [filteredIncidents, setFilteredIncidents] = useState<Incident[]>([]);
 
   useEffect(() => {
-    setFilteredIncidents(incidents);
-  }, [incidents]);
+    if (selectedType) {
+      setFilteredIncidents(incidents.filter(incident => incident.type === selectedType));
+    } else {
+      setFilteredIncidents(incidents);
+    }
+  }, [incidents, selectedType]);
 
   const getUserLocation = () => {
     if ("geolocation" in navigator) {
@@ -210,7 +220,6 @@ const SafetyMap = () => {
         )
         .addTo(map.current);
 
-      // Show popup on hover
       el.addEventListener("mouseenter", () => {
         marker.getPopup().addTo(map.current!);
       });
@@ -298,12 +307,10 @@ const SafetyMap = () => {
 
       newMap.on("click", handleMapClick);
 
-      // Update incidents when map moves
       newMap.on("moveend", async () => {
         const bounds = newMap.getBounds();
 
         try {
-          // Fetch incidents within viewport
           const { data, error } = await supabase
             .from("incidents")
             .select(
@@ -324,7 +331,6 @@ const SafetyMap = () => {
           }
 
           if (data) {
-            // Transform the data to match our Incident type
             const transformedData = data.map((incident) => ({
               ...incident,
               location: incident.location as Location,
@@ -545,6 +551,34 @@ const SafetyMap = () => {
       <div ref={mapContainer} className="absolute inset-0 mt-14" />
 
       <div className="absolute top-20 right-4 z-10 space-x-2 flex">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Filter className="h-4 w-4" />
+              {selectedType ? `Filter: ${selectedType}` : 'Filter Incidents'}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setSelectedType(null)}>
+              Show All
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedType("safety")}>
+              Safety Concerns
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedType("accident")}>
+              Traffic Accidents
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedType("infrastructure")}>
+              Infrastructure Issues
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedType("noise")}>
+              Noise Complaints
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedType("other")}>
+              Other
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button onClick={handleAddIncident} variant="default">
           + Report Incident
         </Button>
