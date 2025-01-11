@@ -487,6 +487,41 @@ const SafetyMap = () => {
     }
   };
 
+  const clearDatabase = async () => {
+    try {
+      // Delete all messages first due to foreign key constraints
+      const { error: messagesError } = await supabase
+        .from('messages')
+        .delete()
+        .neq('id', '0'); // Delete all records
+
+      if (messagesError) throw messagesError;
+
+      // Then delete all incidents
+      const { error: incidentsError } = await supabase
+        .from('incidents')
+        .delete()
+        .neq('id', '0'); // Delete all records
+
+      if (incidentsError) throw incidentsError;
+
+      // Invalidate queries to refresh the UI
+      queryClient.invalidateQueries({ queryKey: ['incidents'] });
+
+      toast({
+        title: "Success",
+        description: "Database cleared successfully",
+      });
+    } catch (error) {
+      console.error('Error clearing database:', error);
+      toast({
+        title: "Error",
+        description: "Failed to clear database",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     const handleFilterIncidents = (event: CustomEvent) => {
       const selectedType = event.detail.type;
@@ -581,6 +616,9 @@ const SafetyMap = () => {
         </DropdownMenu>
         <Button onClick={handleAddIncident} variant="default">
           + Report Incident
+        </Button>
+        <Button onClick={clearDatabase} variant="destructive">
+          Clear Database
         </Button>
       </div>
 
