@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/types";
 
-// Helper function to fetch chat response
 async function fetchChat(url, requestData) {
   const response = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(requestData),
   });
@@ -17,7 +16,7 @@ async function fetchChat(url, requestData) {
   return data.candidates[0].content.parts[0].text;
 }
 
-const apiKey = 'AIzaSyAh2qi-zgjWVVNgYL8h6sJzaA6xX2Vlb8A';
+const apiKey = "lol";
 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
 type Location = {
@@ -37,16 +36,22 @@ type Incident = {
 };
 
 const Chat = ({ incidents }: { incidents: Incident[] }) => {
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
-  const [userInput, setUserInput] = useState('');
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
+    []
+  );
+  const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const incidentSummary = incidents
     .map(
       (incident, index) =>
-        `${index + 1}. Title: ${incident.title}, Type: ${incident.type}, Description: ${incident.description}, Location: (${incident.location.lat}, ${incident.location.lng}), Timestamp: ${incident.timestamp}`
+        `${index + 1}. Title: ${incident.title}, Type: ${
+          incident.type
+        }, Description: ${incident.description}, Location: (${
+          incident.location.lat
+        }, ${incident.location.lng}), Timestamp: ${incident.timestamp}`
     )
-    .join('\n');
+    .join("\n");
 
   const initialPrompt = `
     You are an assistant with access to recent incidents. Here is the data:
@@ -58,36 +63,35 @@ const Chat = ({ incidents }: { incidents: Incident[] }) => {
   let requestData = {
     contents: [
       {
-        parts: [
-          { text: initialPrompt }
-        ]
-      }
-    ]
+        parts: [{ text: initialPrompt }],
+      },
+    ],
   };
 
   const handleSendMessage = async () => {
     if (!userInput.trim()) return;
 
-    const userMessage = { role: 'user', content: userInput };
+    const userMessage = { role: "user", content: userInput };
     requestData = {
       contents: [
         {
-          parts: [
-            { text: initialPrompt+userInput }
-          ]
-        }
-      ]
-    }
+          parts: [{ text: initialPrompt + userInput }],
+        },
+      ],
+    };
     setMessages((prev) => [...prev, userMessage]);
-    setUserInput('');
+    setUserInput("");
     setLoading(true);
 
     try {
       // Fetch the assistant's response based on the user's input
       const assistantResponse = await fetchChat(url, requestData);
-      
+
       // Add the assistant's response to the messages
-      const assistantMessage = { role: 'assistant', content: assistantResponse };
+      const assistantMessage = {
+        role: "assistant",
+        content: assistantResponse,
+      };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Error fetching chat response:", error);
@@ -107,11 +111,15 @@ const Chat = ({ incidents }: { incidents: Incident[] }) => {
             {messages.map((msg, index) => (
               <p
                 key={index}
-                className={`mb-2 ${msg.role === "user" ? "text-right" : "text-left"}`}
+                className={`mb-2 ${
+                  msg.role === "user" ? "text-right" : "text-left"
+                }`}
               >
                 <span
                   className={`inline-block p-2 rounded ${
-                    msg.role === "user" ? "bg-blue-500 text-white" : "bg-gray-300 text-black"
+                    msg.role === "user"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-300 text-black"
                   }`}
                 >
                   {msg.content}
